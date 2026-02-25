@@ -45,7 +45,7 @@ export default function Credits() {
     console.log(
       `⏱️ Door Transition Duration: ${doorTransitionDuration}ms (${
         doorTransitionDuration / 1000
-      }s)`
+      }s)`,
     );
 
     clearAllTimeouts();
@@ -71,7 +71,7 @@ export default function Credits() {
       console.log(
         `⏱️ Dimension Items Duration: ${dimensionItemsDuration}ms (${
           dimensionItemsDuration / 1000
-        }s) - content-fade animation`
+        }s) - content-fade animation`,
       );
     }, showDimensionDelay);
 
@@ -88,7 +88,7 @@ export default function Credits() {
     // Enable button only after BOTH transitions complete
     const totalDuration = Math.max(
       doorTransitionDuration,
-      showDimensionDelay + dimensionItemsDuration
+      showDimensionDelay + dimensionItemsDuration,
     );
     const timeout4 = setTimeout(() => {
       setAnimationComplete(true);
@@ -99,7 +99,7 @@ export default function Credits() {
     console.log(
       `⏱️ Total time until button enabled: ${totalDuration}ms (${
         totalDuration / 1000
-      }s)`
+      }s)`,
     );
 
     timeoutRefs.current.push(timeout1, timeout2, timeout3, timeout4);
@@ -110,7 +110,7 @@ export default function Credits() {
 
     if (!animationComplete) {
       console.log(
-        "⚠️ Return to Door button clicked during transition - ignoring click"
+        "⚠️ Return to Door button clicked during transition - ignoring click",
       );
       console.log("⏳ Please wait for animation to complete");
       return;
@@ -122,7 +122,7 @@ export default function Credits() {
     console.log(
       `⏱️ Return Transition Duration: ${transitionDuration}ms (${
         transitionDuration / 1000
-      }s)`
+      }s)`,
     );
     console.log(`📊 Scene Scale before: ${sceneScale}`);
     console.log(`📊 Content Scale before: ${contentScale}`);
@@ -376,9 +376,9 @@ export default function Credits() {
                       lineHeight: "1.2",
                     }}
                   >
-                    Researching
+                    Researcher
                     <br />
-                    design
+                    Designer
                   </div>
                 </div>
               )}

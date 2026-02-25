@@ -1,10 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1w4A_56rih3-uD4xP1RvW0GKfHu4GT4WC_Heq4ZQvXgk/edit?gid=1184223496#gid=1184223496";
 
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const handleBackToHome = () => {
+    // console.log("why?");
+    navigate("/");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer className="relative w-full bg-black pt-12 pb-0 m-0 overflow-hidden">
       {/* Half Oval Container */}
@@ -44,12 +53,13 @@ export default function Footer() {
           {/* Content */}
           <div className="relative h-[260px] flex flex-col items-center justify-center px-8 gap-3 pt-8">
             {/* Top Title */}
-            <a
-              href="#top"
+            <Link
+              to="/"
+              onClick={handleBackToHome}
               className="text-5xl md:text-6xl font-serif italic text-black hover:underline cursor-pointer text-center"
             >
               Z-Light Horizon
-            </a>
+            </Link>
 
             {/* Bottom Text */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-black text-lg md:text-xl font-serif">

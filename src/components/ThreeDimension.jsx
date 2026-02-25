@@ -4,6 +4,7 @@ import { useGLTF, Environment } from "@react-three/drei";
 import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 import { questions } from "../data/SearchPrompt";
+import { Link } from "react-router-dom";
 
 function FloatingEffect() {
   return null;
@@ -327,6 +328,11 @@ function ThreeDimension() {
     [navigate],
   );
 
+  const handleBackToHome = () => {
+    navigate("/");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div
       ref={containerRef}
@@ -345,8 +351,10 @@ function ThreeDimension() {
           zIndex: 10,
         }}
       >
-        <a
-          href="/"
+        {/* onClick={handleBackToHome} */}
+        <Link
+          to="/"
+          onClick={handleBackToHome}
           style={{
             color: "#D4A574",
             fontSize: "48px",
@@ -357,7 +365,21 @@ function ThreeDimension() {
           }}
         >
           Home
-        </a>
+        </Link>
+        {/* <button
+          onClick={handleBackToHome}
+          style={{
+            color: "#D4A574",
+            fontSize: "48px",
+            fontFamily: "Georgia, serif",
+            textDecoration: "none",
+            fontWeight: "500",
+            textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+          }}
+        >
+          Home
+        </button> */}
+
         <a
           href="#contact"
           onClick={handleContactClick}
