@@ -1,99 +1,53 @@
-import { useState, useEffect, useRef } from "react";
-
-/**
- * InfiniteCarousel Component
- *
- * A reusable infinite scrolling carousel with seamless looping
- * Now with responsive card sizing to always show exactly 3 cards
- *
- * @param {Array} items - Array of JSX elements to display in the carousel
- * @param {number} itemWidth - Base width of each item in pixels (will be overridden by responsive calculation)
- * @param {string} gap - Gap between items in pixels (default: "40px")
- * @param {string} height - Tailwind height class for the carousel (default: "h-96")
- *
- * @example
- * <InfiniteCarousel items={myItems} gap="40px" height="h-[500px]" />
- */
+import { useState, useEffect, useRef, useMemo } from "react";
 
 function InfiniteCarousel({
   items = [],
   itemWidth = 320,
   gap = "40px",
-  height = "h-96",
   bgColour = "",
 }) {
   const totalItems = items.length;
   const containerRef = useRef(null);
   const [responsiveWidth, setResponsiveWidth] = useState(itemWidth);
   const [responsiveHeight, setResponsiveHeight] = useState(400);
-
-  // Return null if no items provided
-  if (totalItems === 0) {
-    return null;
-  }
-
-  // Create 5 copies for smooth infinite scrolling
   const [currentIndex, setCurrentIndex] = useState(totalItems * 2);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const transitionTimeoutRef = useRef(null);
   const isJumpingRef = useRef(false);
 
-  // Parse gap to number
   const gapValue = parseInt(gap);
 
-  // Calculate responsive card width and height to always show 3 cards with proper aspect ratio
+  // Memoize extended items so they don't recreate every render
+  const extendedItems = useMemo(
+    () => [...items, ...items, ...items, ...items, ...items],
+    [items]
+  );
+
   useEffect(() => {
+    if (totalItems === 0) return;
+
     const calculateWidth = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        // Account for arrow buttons (40px each side = 80px total) and gaps (2 gaps between 3 cards)
-        const arrowSpace = 160; // 80px per arrow button
+        const arrowSpace = 160;
         const availableWidth = containerWidth - arrowSpace - gapValue * 2;
         const calculatedWidth = Math.floor(availableWidth / 3);
-
-        // Maintain 4:3 aspect ratio (landscape cards)
         const calculatedHeight = Math.floor(calculatedWidth * 0.75);
-
         setResponsiveWidth(calculatedWidth);
         setResponsiveHeight(calculatedHeight);
       }
     };
 
     calculateWidth();
-    window.addEventListener("resize", calculateWidth);
-    return () => window.removeEventListener("resize", calculateWidth);
-  }, [gapValue]);
 
-  // Duplicate items: [items, items, items, items, items]
-  const extendedItems = [
-    ...items,
-    ...items,
-    ...items, // Center set - starting position
-    ...items,
-    ...items,
-  ];
+    const resizeObserver = new ResizeObserver(calculateWidth);
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
 
-  function handleLeftClick() {
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-    setIsTransitioning(true);
-    isJumpingRef.current = false;
-    setCurrentIndex((prev) => prev - 1);
-  }
+    return () => resizeObserver.disconnect();
+  }, [gapValue, totalItems]);
 
-  function handleRightClick() {
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-    setIsTransitioning(true);
-    isJumpingRef.current = false;
-    setCurrentIndex((prev) => prev + 1);
-  }
-
-  // Handle repositioning when scrolling too far
   useEffect(() => {
-    if (isJumpingRef.current) {
+    if (totalItems === 0 || isJumpingRef.current) {
       isJumpingRef.current = false;
       return;
     }
@@ -101,18 +55,13 @@ function InfiniteCarousel({
     const minSafeIndex = totalItems;
     const maxSafeIndex = totalItems * 4 - 1;
 
-    if (currentIndex < minSafeIndex) {
+    if (currentIndex < minSafeIndex || currentIndex > maxSafeIndex) {
       transitionTimeoutRef.current = setTimeout(() => {
         setIsTransitioning(false);
         isJumpingRef.current = true;
-        setCurrentIndex(currentIndex + totalItems);
-        setTimeout(() => setIsTransitioning(true), 50);
-      }, 1000);
-    } else if (currentIndex > maxSafeIndex) {
-      transitionTimeoutRef.current = setTimeout(() => {
-        setIsTransitioning(false);
-        isJumpingRef.current = true;
-        setCurrentIndex(currentIndex - totalItems);
+        setCurrentIndex((prev) =>
+          prev < minSafeIndex ? prev + totalItems : prev - totalItems
+        );
         setTimeout(() => setIsTransitioning(true), 50);
       }, 1000);
     }
@@ -123,6 +72,24 @@ function InfiniteCarousel({
       }
     };
   }, [currentIndex, totalItems]);
+
+  if (totalItems === 0) return null;
+
+  function handleLeftClick() {
+    if (transitionTimeoutRef.current)
+      clearTimeout(transitionTimeoutRef.current);
+    setIsTransitioning(true);
+    isJumpingRef.current = false;
+    setCurrentIndex((prev) => prev - 1);
+  }
+
+  function handleRightClick() {
+    if (transitionTimeoutRef.current)
+      clearTimeout(transitionTimeoutRef.current);
+    setIsTransitioning(true);
+    isJumpingRef.current = false;
+    setCurrentIndex((prev) => prev + 1);
+  }
 
   return (
     <div
@@ -165,6 +132,7 @@ function InfiniteCarousel({
             }px - ${currentIndex} * (${responsiveWidth}px + ${gap})), 0, 0)`,
             backfaceVisibility: "hidden",
             perspective: "1000px",
+            willChange: "transform",
           }}
         >
           {extendedItems.map((item, index) => (
@@ -176,6 +144,7 @@ function InfiniteCarousel({
                 marginLeft: index === 0 ? "0" : gap,
                 backfaceVisibility: "hidden",
                 transform: "translateZ(0)",
+                containIntrinsicSize: "auto",
               }}
             >
               {item}

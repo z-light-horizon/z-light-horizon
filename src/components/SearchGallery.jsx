@@ -1,268 +1,137 @@
-import React, { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Filter, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import PopupCard from "./PopupCard";
+import { data } from "../data/Data";
 
 const SearchGallery = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isGalleryPage = location.pathname === "/gallery";
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    purpose: [],
+    sector: [],
+  });
 
-  const handleCardClick = (cardData) => {
-    console.log("Card clicked:", cardData);
-    setSelectedCard(cardData);
+  // Pick up search term passed from ThreeDimension
+  useEffect(() => {
+    if (location.state?.searchTerm) {
+      setSearchTerm(location.state.searchTerm);
+    }
+  }, [location.state]);
+
+  const filterOptions = {
+    Purpose: {
+      key: "purpose",
+      options: ["Creativity", "Information", "Community"],
+    },
+    Sector: {
+      key: "sector",
+      options: ["Public", "Private"],
+    },
+  };
+
+  const toggleFilter = (key, value) => {
+    setActiveFilters((prev) => {
+      const current = prev[key];
+      return {
+        ...prev,
+        [key]: current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
+    });
+  };
+
+  const resetFilters = () => {
+    setActiveFilters({ purpose: [], sector: [] });
+    setSearchTerm("");
+    setShowFilter(false);
+  };
+
+  const hasActiveFilters =
+    activeFilters.purpose.length > 0 ||
+    activeFilters.sector.length > 0 ||
+    searchTerm.trim() !== "";
+
+  const filteredData = data.filter((item) => {
+    const term = searchTerm.toLowerCase();
+    const matchesSearch =
+      term === "" ||
+      item.name?.toLowerCase().includes(term) ||
+      item.description?.toLowerCase().includes(term) ||
+      item.categories?.some((c) => c.toLowerCase().includes(term)) ||
+      item.sector?.toLowerCase().includes(term) ||
+      item.status?.toLowerCase().includes(term) ||
+      item.altPurpose?.toLowerCase().includes(term);
+
+    const matchesPurpose =
+      activeFilters.purpose.length === 0 ||
+      activeFilters.purpose.some(
+        (p) => p.toLowerCase() === item.altPurpose?.toLowerCase()
+      );
+
+    const matchesSector =
+      activeFilters.sector.length === 0 ||
+      activeFilters.sector.some(
+        (s) => s.toLowerCase() === item.sector?.toLowerCase()
+      );
+
+    return matchesSearch && matchesPurpose && matchesSector;
+  });
+
+  const handleCardClick = (item) => {
+    setSelectedCard(item);
     setIsPopupOpen(true);
   };
 
   const handleClosePopup = () => {
-    console.log("Closing popup");
     setIsPopupOpen(false);
     setSelectedCard(null);
   };
 
-  // Sample data - replace with your actual data
-  const galleryData = [
-    {
-      id: 1,
-      title: "International Team",
-      image:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-      description: "A beautiful mountain landscape",
-    },
-    {
-      id: 2,
-      title: "@MODU9949",
-      image:
-        "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=400&h=300&fit=crop",
-      description: "Misty forest scenery",
-    },
-    {
-      id: 3,
-      title: "@HJ_MOONIES_MUSIC",
-      image:
-        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=300&fit=crop",
-      description: "Live music performance",
-    },
-    {
-      id: 4,
-      title: "@MSIA BC ENTERTAINMENT",
-      image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      description: "Concert stage lights",
-    },
-    {
-      id: 5,
-      title: "효동 TV",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
-      description: "Music equipment setup",
-    },
-    {
-      id: 6,
-      title: "@HJ_MOONIES_MUSIC",
-      image:
-        "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=300&fit=crop",
-      description: "Recording studio",
-    },
-    {
-      id: 7,
-      title: "International Team",
-      image:
-        "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&h=300&fit=crop",
-      description: "Beach sunset view",
-    },
-    {
-      id: 8,
-      title: "@MODU9949",
-      image:
-        "https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&h=300&fit=crop",
-      description: "Vinyl records collection",
-    },
-    {
-      id: 9,
-      title: "@HJ_MOONIES_MUSIC",
-      image:
-        "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&h=300&fit=crop",
-      description: "Music festival crowd",
-    },
-    {
-      id: 10,
-      title: "MALAYSIA BC",
-      image:
-        "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=300&fit=crop",
-      description: "Concert lighting effects",
-    },
-    {
-      id: 11,
-      title: "77TV",
-      image:
-        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=300&fit=crop",
-      description: "Live band performance",
-    },
-    {
-      id: 12,
-      title: "@HJ_MOONIES_MUSIC",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-      description: "Portrait photography",
-    },
-    {
-      id: 13,
-      title: "My Entertainment Team",
-      image:
-        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&h=300&fit=crop",
-      description: "Man with camera",
-    },
-    {
-      id: 14,
-      title: "@MODU9949",
-      image:
-        "https://images.unsplash.com/photo-1496293455970-f8581aae0e3b?w=400&h=300&fit=crop",
-      description: "City nightlife",
-    },
-    {
-      id: 15,
-      title: "Creative Studios",
-      image:
-        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=300&fit=crop",
-      description: "Turntable and vinyl",
-    },
-    {
-      id: 16,
-      title: "Music Fusion",
-      image:
-        "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
-      description: "Audio mixing console",
-    },
-    {
-      id: 17,
-      title: "Digital Arts",
-      image:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
-      description: "Digital artwork display",
-    },
-    {
-      id: 18,
-      title: "Sound Wave Studio",
-      image:
-        "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=300&fit=crop",
-      description: "Podcast recording setup",
-    },
-    {
-      id: 19,
-      title: "Beat Makers",
-      image:
-        "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=400&h=300&fit=crop",
-      description: "Music production",
-    },
-    {
-      id: 20,
-      title: "Entertainment Hub",
-      image:
-        "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=400&h=300&fit=crop",
-      description: "Creative workspace",
-    },
-    {
-      id: 21,
-      title: "Stage Performance",
-      image:
-        "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&h=300&fit=crop",
-      description: "Concert stage view",
-    },
-    {
-      id: 22,
-      title: "Live Events",
-      image:
-        "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=400&h=300&fit=crop",
-      description: "Event crowd",
-    },
-    {
-      id: 23,
-      title: "Video Production",
-      image:
-        "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=300&fit=crop",
-      description: "Film production set",
-    },
-    {
-      id: 24,
-      title: "Media Network",
-      image:
-        "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=300&fit=crop",
-      description: "Broadcasting equipment",
-    },
-    {
-      id: 25,
-      title: "Concert Series",
-      image:
-        "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=400&h=300&fit=crop",
-      description: "Live concert atmosphere",
-    },
-    {
-      id: 26,
-      title: "Audio Visual",
-      image:
-        "https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=400&h=300&fit=crop",
-      description: "AV equipment",
-    },
-    {
-      id: 27,
-      title: "Streaming Channel",
-      image:
-        "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=400&h=300&fit=crop",
-      description: "Streaming setup",
-    },
-    {
-      id: 28,
-      title: "Festival Grounds",
-      image:
-        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=300&fit=crop",
-      description: "Music festival venue",
-    },
-    {
-      id: 29,
-      title: "Recording Studio",
-      image:
-        "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400&h=300&fit=crop",
-      description: "Professional recording",
-    },
-    {
-      id: 30,
-      title: "DJ Collective",
-      image:
-        "https://images.unsplash.com/photo-1571266028243-d220c6b2c451?w=400&h=300&fit=crop",
-      description: "DJ performance",
-    },
-    {
-      id: 31,
-      title: "Performance Arts",
-      image:
-        "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=400&h=300&fit=crop",
-      description: "Artistic performance",
-    },
-    {
-      id: 32,
-      title: "Media Productions",
-      image:
-        "https://images.unsplash.com/photo-1485579149621-3123dd979885?w=400&h=300&fit=crop",
-      description: "Media content creation",
-    },
-  ];
-
-  // Calculate rows based on data length
-  // Each row has 6 columns
   const itemsPerRow = 6;
-  const totalItems = galleryData.length;
-  const rowCount = Math.ceil(totalItems / itemsPerRow);
-
-  // Group items into rows of 6
+  const rowCount = Math.ceil(filteredData.length / itemsPerRow);
   const rows = [];
   for (let i = 0; i < rowCount; i++) {
-    const rowItems = galleryData.slice(i * itemsPerRow, (i + 1) * itemsPerRow);
-    rows.push(rowItems);
+    rows.push(filteredData.slice(i * itemsPerRow, (i + 1) * itemsPerRow));
   }
 
   return (
     <div className="min-h-screen bg-black p-8">
-      {/* Search Bar Section - constrained width */}
+      {/* Back Button */}
+      {isGalleryPage && (
+        <div className="absolute top-8 left-8 z-10">
+          <button
+            onClick={() => navigate("/")}
+            className="text-white font-bold relative overflow-hidden group"
+            style={{
+              fontFamily: "Georgia, serif",
+              fontStyle: "italic",
+              background: "transparent",
+              border: "none",
+              padding: "0.5rem 1rem",
+              fontSize: "1.5rem",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+              style={{ zIndex: -1 }}
+            ></span>
+            <span className="absolute inset-0 border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="relative z-10 group-hover:text-black transition-colors duration-300">
+              ← Back
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Search Bar Section */}
       <div className="max-w-3xl mx-auto mb-8 w-full">
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
@@ -270,75 +139,161 @@ const SearchGallery = () => {
             <div className="relative flex items-center bg-gradient-to-r from-amber-200 to-yellow-300 rounded-full overflow-hidden">
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search by name, category, sector..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-6 py-2 bg-transparent outline-none text-gray-800 placeholder-gray-600"
+                className="flex-1 px-6 py-3 bg-transparent outline-none text-gray-800 placeholder-gray-600"
               />
-              <button className="px-6 py-2 hover:bg-white/20 transition-colors">
+              <button className="px-6 py-3 hover:bg-white/20 transition-colors">
                 <Search className="w-5 h-5 text-gray-800" />
               </button>
             </div>
           </div>
 
+          {/* Filter Button */}
           <div className="relative">
             <div className="absolute -inset-1 bg-orange-500 rounded-full blur-lg opacity-50"></div>
-            <button className="relative p-3 bg-gradient-to-r from-amber-200 to-yellow-300 rounded-full hover:from-amber-300 hover:to-yellow-400 transition-colors">
+            <button
+              onClick={() => setShowFilter((prev) => !prev)}
+              className={`relative p-3 bg-gradient-to-r from-amber-200 to-yellow-300 rounded-full hover:from-amber-300 hover:to-yellow-400 transition-colors ${
+                activeFilters.purpose.length > 0 ||
+                activeFilters.sector.length > 0
+                  ? "ring-2 ring-white"
+                  : ""
+              }`}
+            >
               <Filter className="w-6 h-6 text-gray-800" />
+            </button>
+
+            {/* Filter Dropdown */}
+            {showFilter && (
+              <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl z-50 overflow-hidden">
+                {Object.entries(filterOptions).map(
+                  ([label, { key, options }]) => (
+                    <div
+                      key={key}
+                      className="p-4 border-b border-gray-100 last:border-0"
+                    >
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
+                        {label}
+                      </p>
+                      <div className="flex flex-col gap-1">
+                        {options.map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => toggleFilter(key, option)}
+                            className={`text-left px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                              activeFilters[key].includes(option)
+                                ? "bg-amber-300 text-gray-800"
+                                : "text-gray-700 hover:bg-amber-100"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Reset / X Button */}
+          <div className="relative">
+            <div className="absolute -inset-1 bg-orange-500 rounded-full blur-lg opacity-50"></div>
+            <button
+              onClick={resetFilters}
+              className={`relative p-3 bg-gradient-to-r from-amber-200 to-yellow-300 rounded-full hover:from-amber-300 hover:to-yellow-400 transition-colors ${
+                hasActiveFilters
+                  ? "opacity-100"
+                  : "opacity-40 cursor-not-allowed"
+              }`}
+              disabled={!hasActiveFilters}
+              title="Reset all filters"
+            >
+              <X className="w-6 h-6 text-gray-800" />
             </button>
           </div>
         </div>
+
+        {/* Active filter tags */}
+        {(activeFilters.purpose.length > 0 ||
+          activeFilters.sector.length > 0) && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {[...activeFilters.purpose, ...activeFilters.sector].map((tag) => (
+              <span
+                key={tag}
+                className="px-3 py-1 bg-amber-300 text-gray-800 text-xs font-bold rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Result count */}
+        {hasActiveFilters && (
+          <p className="text-amber-200 text-sm mt-3 text-center">
+            {filteredData.length} result{filteredData.length !== 1 ? "s" : ""}{" "}
+            found
+            {searchTerm.trim() !== "" ? ` for "${searchTerm}"` : ""}
+          </p>
+        )}
       </div>
 
       {/* Gallery Grid */}
-      <div className="space-y-8">
-        {rows.map((rowItems, rowIndex) => (
-          <div key={rowIndex} className="relative -mx-8">
-            {/* Amber-200 background - full width to edge */}
-            <div className="absolute inset-0 bg-amber-200"></div>
-
-            {/* Grid content - 6 columns per row - full width with equal spacing */}
-            <div className="relative px-4">
-              <div className="grid grid-cols-6 gap-4">
-                {rowItems.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() =>
-                      handleCardClick({
-                        imageSrc: item.image,
-                        title: item.title,
-                        description: item.description,
-                      })
-                    }
-                    className="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer"
-                  >
-                    <div className="aspect-video w-full">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                      />
+      {filteredData.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-amber-200 text-2xl font-bold">No results found</p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {rows.map((rowItems, rowIndex) => (
+            <div key={rowIndex} className="relative -mx-8">
+              <div className="absolute inset-0 bg-amber-200"></div>
+              <div className="relative px-4">
+                <div className="grid grid-cols-6 gap-4">
+                  {rowItems.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleCardClick(item)}
+                      className="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer"
+                    >
+                      <div className="aspect-video w-full">
+                        <img
+                          src={item.thumbnailURL}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-3 bg-black/50">
+                        <p className="text-white text-sm font-medium truncate">
+                          {item.name}
+                        </p>
+                      </div>
                     </div>
-                    <div className="p-3 bg-black/50">
-                      <p className="text-white text-sm font-medium truncate">
-                        {item.title}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Popup Card - rendered at top level */}
+      {/* Popup Card */}
       <PopupCard
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={selectedCard?.title || "@Image Title"}
-        imageSrc={selectedCard?.imageSrc || "./src/assets/imgs/Cute_Dragon.jpg"}
+        title={selectedCard?.name || "—"}
+        imageSrc={selectedCard?.thumbnailURL}
         description={selectedCard?.description}
+        category={selectedCard?.categories?.join(" / ")}
+        purpose={selectedCard?.altPurpose}
+        link={selectedCard?.link}
+        sector={selectedCard?.sector}
+        status={selectedCard?.status}
+        extra={selectedCard?.extra}
       />
     </div>
   );

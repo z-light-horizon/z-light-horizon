@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const handleClick = (name) => {
@@ -6,7 +7,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative w-full bg-black py-12">
+    <footer className="relative w-full bg-black pt-12 pb-0 m-0 overflow-hidden">
       {/* Half Oval Container */}
       <div className="relative mx-auto w-full max-w-3xl px-4">
         {/* Oval Background */}
@@ -46,7 +47,7 @@ export default function Footer() {
             {/* Top Title */}
             <a
               href="#top"
-              className="text-5xl md:text-6xl font-serif italic text-black hover:underline cursor-pointer"
+              className="text-5xl md:text-6xl font-serif italic text-black hover:underline cursor-pointer text-center"
             >
               Z-Light Horizon
             </a>
@@ -83,6 +84,15 @@ export default function Footer() {
                 Center
               </button>
             </div>
+
+            {/* Credits Link */}
+            <Link
+              to="/credits"
+              className="text-black font-serif italic text-2xl md:text-3xl cursor-pointer mt-1 text-center transition-all duration-200 hover:font-bold hover:underline"
+              style={{ letterSpacing: "1.9em", marginRight: "-1.9em" }}
+            >
+              Credits
+            </Link>
           </div>
         </div>
       </div>

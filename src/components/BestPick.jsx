@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import ProjectorIMG from "../assets/imgs/ProjectorIMG.png";
+import { BestPickData } from "../data/BestPickData";
 
 const BestPick = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -10,6 +11,15 @@ const BestPick = () => {
   const [nextSlide, setNextSlide] = useState(0);
   const imageRef = useRef(null);
   const dotRef = useRef(null);
+  const imagePositionRef = useRef({
+    centerX: typeof window !== "undefined" ? window.innerWidth / 2 : 400,
+    centerY: typeof window !== "undefined" ? window.innerHeight / 2 : 400,
+    radius: 250,
+  });
+  const dotPositionRef = useRef({
+    x: 86,
+    y: typeof window !== "undefined" ? window.innerHeight - 240 : 400,
+  });
   const [imagePosition, setImagePosition] = useState({
     centerX: typeof window !== "undefined" ? window.innerWidth / 2 : 400,
     centerY: typeof window !== "undefined" ? window.innerHeight / 2 : 400,
@@ -20,116 +30,90 @@ const BestPick = () => {
     y: typeof window !== "undefined" ? window.innerHeight - 240 : 400,
   });
 
-  const slides = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop",
-      title: "Ancient Temple",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=800&fit=crop",
-      title: "Mountain Serenity",
-      description:
-        "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. The beauty of nature captivates and inspires endless wonder.",
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
-      title: "Ocean Paradise",
-      description:
-        "Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. Discover the tranquil beauty of coastal landscapes.",
-    },
-  ];
+  const slides = BestPickData.map((item) => ({
+    id: item.id,
+    image: item.thumbnailURL,
+    title: item.name,
+    description: item.description,
+    category: item.categories?.join(" / "),
+    purpose: item.altPurpose,
+    link: item.link,
+    sector: item.sector,
+    status: item.status,
+    extra: item.extra,
+  }));
 
   useEffect(() => {
     const updatePositions = () => {
+      const container = imageRef.current?.closest(".min-h-screen");
+      if (!container) return;
+      const containerRect = container.getBoundingClientRect();
       if (imageRef.current) {
         const rect = imageRef.current.getBoundingClientRect();
-        setImagePosition({
-          centerX: rect.left + rect.width / 2,
-          centerY: rect.top + rect.height / 2,
+        const pos = {
+          centerX: rect.left - containerRect.left + rect.width / 2,
+          centerY: rect.top - containerRect.top + rect.height / 2,
           radius: rect.width / 2,
-        });
+        };
+        imagePositionRef.current = pos;
+        setImagePosition(pos);
       }
-
       if (dotRef.current) {
         const dotRect = dotRef.current.getBoundingClientRect();
-        setDotPosition({
-          x: dotRect.left + dotRect.width / 2,
-          y: dotRect.top + dotRect.height / 2,
-        });
+        const pos = {
+          x: dotRect.left - containerRect.left + dotRect.width / 2,
+          y: dotRect.top - containerRect.top + dotRect.height / 2,
+        };
+        dotPositionRef.current = pos;
+        setDotPosition(pos);
       }
     };
-
     setTimeout(updatePositions, 100);
-
     window.addEventListener("resize", updatePositions);
-    window.addEventListener("scroll", updatePositions);
-
-    return () => {
-      window.removeEventListener("resize", updatePositions);
-      window.removeEventListener("scroll", updatePositions);
-    };
+    return () => window.removeEventListener("resize", updatePositions);
   }, []);
 
   const goToSlide = (index) => {
     if (isAnimating || index === currentSlide) return;
-
     if (imageRef.current && dotRef.current) {
+      const container = imageRef.current.closest(".min-h-screen");
+      const containerRect = container.getBoundingClientRect();
       const imgRect = imageRef.current.getBoundingClientRect();
       const dotRect = dotRef.current.getBoundingClientRect();
-
-      setImagePosition({
-        centerX: imgRect.left + imgRect.width / 2,
-        centerY: imgRect.top + imgRect.height / 2,
+      const imgPos = {
+        centerX: imgRect.left - containerRect.left + imgRect.width / 2,
+        centerY: imgRect.top - containerRect.top + imgRect.height / 2,
         radius: imgRect.width / 2,
-      });
-
-      setDotPosition({
-        x: dotRect.left + dotRect.width / 2,
-        y: dotRect.top + dotRect.height / 2,
-      });
+      };
+      const dotPos = {
+        x: dotRect.left - containerRect.left + dotRect.width / 2,
+        y: dotRect.top - containerRect.top + dotRect.height / 2,
+      };
+      imagePositionRef.current = imgPos;
+      dotPositionRef.current = dotPos;
+      setImagePosition(imgPos);
+      setDotPosition(dotPos);
     }
-
     setIsProjectorOn(false);
     setIsAnimating(true);
     setNextSlide(index);
     setScannerKey((prev) => prev + 1);
     setScanProgress(0);
-
     const duration = 1000;
     const startTime = Date.now();
-
     const easeInOutCubic = (t) => {
-      if (t < 0.5) {
-        return 2 * t * t;
-      }
+      if (t < 0.5) return 2 * t * t;
       return 1 - Math.pow(-2 * t + 2, 2) / 2;
     };
-
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const linearProgress = Math.min(elapsed / duration, 1);
       const easedProgress = easeInOutCubic(linearProgress);
       setScanProgress(easedProgress);
-
-      if (linearProgress < 1) {
-        requestAnimationFrame(animate);
-      }
+      if (linearProgress < 1) requestAnimationFrame(animate);
     };
-
     requestAnimationFrame(animate);
-
-    setTimeout(() => {
-      setCurrentSlide(index);
-    }, 1000);
-
+    setTimeout(() => setCurrentSlide(index), 1000);
     setTimeout(() => {
       setIsAnimating(false);
       setScanProgress(0);
@@ -143,6 +127,31 @@ const BestPick = () => {
   const leftX = imagePosition.centerX - imagePosition.radius;
   const rightX = imagePosition.centerX + imagePosition.radius;
   const sweepDistance = imagePosition.radius * 2;
+  const activeSlide = slides[isAnimating ? nextSlide : currentSlide];
+
+  const linkClass =
+    "text-xl font-bold text-amber-200 hover:text-amber-400 underline transition-colors break-words";
+  const textClass = "text-xl font-bold text-amber-200";
+
+  const InfoRow = ({ label, value, isLink }) => (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-widest text-amber-400 opacity-70">
+        {label}
+      </p>
+      {isLink && value ? (
+        <a
+          href={value}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          {value}
+        </a>
+      ) : (
+        <p className={textClass}>{value || "—"}</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white p-8 flex flex-col relative overflow-hidden">
@@ -163,7 +172,6 @@ const BestPick = () => {
         }}
       />
 
-      {/* Projector Image */}
       <div
         style={{
           position: "absolute",
@@ -175,18 +183,14 @@ const BestPick = () => {
         <img
           src={ProjectorIMG}
           alt="Projector"
-          style={{
-            display: "block",
-            maxWidth: "150px",
-            height: "auto",
-          }}
+          style={{ display: "block", maxWidth: "150px", height: "auto" }}
         />
       </div>
 
       {isAnimating && (
         <svg
           style={{
-            position: "fixed",
+            position: "absolute",
             inset: 0,
             width: "100%",
             height: "100%",
@@ -223,7 +227,7 @@ const BestPick = () => {
 
       <div className="relative z-10">
         <div className="mb-12">
-          <h1 className="text-6xl font-bold text-amber-200 inline-block border-b-4 border-amber-200 pb-2">
+          <h1 className="text-5xl font-bold text-amber-200 inline-block underline border-amber-200 pb-0 font-amiri italic">
             Best Pick
           </h1>
         </div>
@@ -235,15 +239,11 @@ const BestPick = () => {
           >
             <div
               ref={imageRef}
-              className={`transition-all duration-500`}
-              style={{
-                width: "500px",
-                height: "500px",
-                position: "relative",
-              }}
+              className="transition-all duration-500"
+              style={{ width: "500px", height: "500px", position: "relative" }}
             >
               <div
-                className={`absolute transition-opacity duration-500`}
+                className="absolute transition-opacity duration-500"
                 style={{
                   top: "50%",
                   left: "50%",
@@ -266,7 +266,6 @@ const BestPick = () => {
                 className="absolute inset-0 rounded-full overflow-hidden border-4 border-amber-200 shadow-2xl"
                 style={{ zIndex: 1 }}
               >
-                {/* Current image - always visible */}
                 <div
                   style={{
                     position: "absolute",
@@ -277,8 +276,6 @@ const BestPick = () => {
                     zIndex: 1,
                   }}
                 />
-
-                {/* Next image - revealed by scan */}
                 {isAnimating && (
                   <div
                     style={{
@@ -292,8 +289,6 @@ const BestPick = () => {
                     }}
                   />
                 )}
-
-                {/* Scan line inside circle */}
                 {isAnimating && (
                   <div
                     key={scannerKey}
@@ -336,7 +331,7 @@ const BestPick = () => {
                       : "bg-gray-500 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
-                ></button>
+                />
               ))}
             </div>
           </div>
@@ -350,14 +345,14 @@ const BestPick = () => {
                 transition: isAnimating ? "none" : "opacity 0.3s ease-out",
               }}
             >
-              <h2 className="text-5xl font-bold text-amber-200 italic mb-6">
-                {slides[isAnimating ? nextSlide : currentSlide].title}
+              <h2 className="text-5xl font-bold text-amber-200 italic mb-4">
+                {activeSlide.title}
               </h2>
               <p
                 className="text-lg leading-relaxed text-amber-200 italic"
                 style={{ maxWidth: "500px" }}
               >
-                {slides[isAnimating ? nextSlide : currentSlide].description}
+                {activeSlide.description}
               </p>
             </div>
           </div>

@@ -1,147 +1,107 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import DigitalCards from "./DigitalCards";
 import InfiniteCarousel from "./InfiniteCarousel";
 import PopupCard from "./PopUpCard";
-import dragonImg from "../assets/imgs/Cute_Dragon.jpg";
+import { data } from "../data/Data";
 
 function DigitalAssets() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
 
-  const handleCardClick = (cardData) => {
+  const handleCardClick = useCallback((cardData) => {
     setSelectedCard(cardData);
     setIsPopupOpen(true);
-  };
+  }, []);
 
-  const handleClosePopup = () => {
+  const handleClosePopup = useCallback(() => {
     setIsPopupOpen(false);
     setSelectedCard(null);
-  };
+  }, []);
 
-  const demoItems = [
-    <div
-      key={1}
-      className="h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc="https://images.unsplash.com/photo-1573865526739-10659fec78a5?ixid=M3w4MjcwNjd8MHwxfHNlYXJjaHwyfHxjYXR8ZW58MHx8fHwxNzY3MjY4NDIwfDA&ixlib=rb-4.1.0&w=1080&h=1920&fit=max&q=80"
-        title="@Cute Cat"
-        description="A lovely cat enjoying the day"
-      />
-    </div>,
-    <div
-      key={2}
-      className="h-full w-full flex items-center justify-center text-gray-800 text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc="https://images.unsplash.com/photo-1519052537078-e6302a4968d4?ixid=M3w4MjcwNjd8MHwxfHNlYXJjaHw2fHxjYXR8ZW58MHx8fHwxNzY3MjY4NDIwfDA&ixlib=rb-4.1.0&w=1080&h=1920&fit=max&q=80"
-        title="@Sleepy Kitten"
-        description="An adorable kitten taking a nap"
-      />
-    </div>,
-    <div
-      key={3}
-      className="h-full w-full flex items-center justify-center text-gray-800 text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc="https://images.unsplash.com/photo-1495360010541-f48722b34f7d?ixid=M3w4MjcwNjd8MHwxfHNlYXJjaHwzfHxjYXR8ZW58MHx8fHwxNzY3MjY4NDIwfDA&ixlib=rb-4.1.0&w=1080&h=1920&fit=max&q=80"
-        title="@Curious Cat"
-        description="A curious feline exploring"
-      />
-    </div>,
-    <div
-      key={4}
-      className="bg-blue-700 h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      Item 4
-    </div>,
-    <div
-      key={5}
-      className="bg-blue-500 h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      Item 5
-    </div>,
-    <div
-      key={6}
-      className="bg-emerald-500 h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      Item 6
-    </div>,
-    <div
-      key={7}
-      className="bg-emerald-800 h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      Item 7
-    </div>,
-  ];
+  const midpoint = Math.ceil(data.length / 2);
 
-  const demoItems1 = [
-    <div
-      key={1}
-      className="h-full w-full flex items-center justify-center text-white text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc={dragonImg}
-        title="@Cute Dragon"
-        description="Dragon cute"
-      />
-    </div>,
-    <div
-      key={2}
-      className="h-full w-full flex items-center justify-center text-gray-800 text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc="https://images.unsplash.com/photo-1561948955-570b270e7c36?ixid=M3w4MjcwNjd8MHwxfHNlYXJjaHw3fHxjYXR8ZW58MHx8fHwxNzY3MjY4NDIwfDA&ixlib=rb-4.1.0&w=1080&h=1920&fit=max&q=80"
-        title="@Shock Kitten"
-        description="An adorable kitten taking a nap"
-      />
-    </div>,
-    <div
-      key={3}
-      className="h-full w-full flex items-center justify-center text-gray-800 text-2xl font-bold"
-    >
-      <DigitalCards
-        onCardClick={handleCardClick}
-        imageSrc="https://images.unsplash.com/photo-1495360010541-f48722b34f7d?ixid=M3w4MjcwNjd8MHwxfHNlYXJjaHwzfHxjYXR8ZW58MHx8fHwxNzY3MjY4NDIwfDA&ixlib=rb-4.1.0&w=1080&h=1920&fit=max&q=80"
-        title="@Curious Cat"
-        description="A curious feline exploring"
-      />
-    </div>,
-  ];
+  const firstHalfItems = useMemo(
+    () =>
+      data.slice(0, midpoint).map((item) => (
+        <div
+          key={item.id}
+          className="h-full w-full flex items-center justify-center"
+        >
+          <DigitalCards
+            onCardClick={handleCardClick}
+            imageSrc={item.thumbnailURL}
+            imageAlt={item.name}
+            title={item.name}
+            description={item.description}
+            category={item.categories?.join(" / ")}
+            purpose={item.altPurpose}
+            link={item.link}
+            sector={item.sector}
+            status={item.status}
+            extra={item.extra}
+          />
+        </div>
+      )),
+    [handleCardClick]
+  );
+
+  const secondHalfItems = useMemo(
+    () =>
+      data.slice(midpoint).map((item) => (
+        <div
+          key={item.id}
+          className="h-full w-full flex items-center justify-center"
+        >
+          <DigitalCards
+            onCardClick={handleCardClick}
+            imageSrc={item.thumbnailURL}
+            imageAlt={item.name}
+            title={item.name}
+            description={item.description}
+            category={item.categories?.join(" / ")}
+            purpose={item.altPurpose}
+            link={item.link}
+            sector={item.sector}
+            status={item.status}
+            extra={item.extra}
+          />
+        </div>
+      )),
+    [handleCardClick]
+  );
 
   return (
     <div className="bg-amber-200 min-h-screen">
       <div className="bg-black flex flex-col min-h-screen py-12">
-        <div className="text-6xl px-5 text-amber-200 font-amiri italic mb-8">
+        <div className="text-5xl px-5 text-amber-200 font-amiri italic mb-8 inline-block underline">
           Digital Assets
         </div>
-
         <div className="flex-1 flex flex-col justify-center gap-8">
           <InfiniteCarousel
-            items={demoItems}
+            items={firstHalfItems}
             gap="50px"
             bgColour="bg-amber-200"
           />
           <InfiniteCarousel
-            items={demoItems1}
+            items={secondHalfItems}
             gap="50px"
             bgColour="bg-amber-200"
           />
         </div>
       </div>
 
-      {/* Popup rendered at top level */}
       <PopupCard
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={selectedCard?.title || "@Image Title"}
-        imageSrc={selectedCard?.imageSrc || "./src/assets/imgs/Cute_Dragon.jpg"}
+        title={selectedCard?.title || "—"}
+        imageSrc={selectedCard?.imageSrc}
         description={selectedCard?.description}
+        category={selectedCard?.category}
+        purpose={selectedCard?.purpose}
+        link={selectedCard?.link}
+        sector={selectedCard?.sector}
+        status={selectedCard?.status}
+        extra={selectedCard?.extra}
       />
     </div>
   );

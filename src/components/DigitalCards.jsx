@@ -1,33 +1,66 @@
-function DigitalCards({
+import { useState, useCallback, memo } from "react";
+
+const DigitalCards = memo(function DigitalCards({
   onCardClick,
   imageSrc = "./src/assets/imgs/Cute_Dragon.jpg",
   imageAlt = "Image",
   title = "Image Title",
   description = "",
+  category = "",
+  purpose = "",
+  link = "",
+  sector = "",
+  status = "",
+  extra = "",
 }) {
-  const handleClick = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleClick = useCallback(() => {
     onCardClick({
       imageSrc,
       imageAlt,
       title,
       description,
+      category,
+      purpose,
+      link,
+      sector,
+      status,
+      extra,
     });
-  };
+  }, [
+    imageSrc,
+    imageAlt,
+    title,
+    description,
+    category,
+    purpose,
+    link,
+    sector,
+    status,
+    extra,
+    onCardClick,
+  ]);
 
   return (
     <div
-      className="relative h-full w-full cursor-pointer group overflow-hidden transition-transform duration-300 hover:scale-106"
+      className="relative h-full w-full cursor-pointer group overflow-hidden transition-transform duration-300 hover:scale-105"
       onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         backfaceVisibility: "hidden",
         transform: "translate3d(0, 0, 0)",
-        willChange: "transform",
+        willChange: isHovered ? "transform" : "auto",
+        contain: "layout style paint",
       }}
     >
       <img
         src={imageSrc}
         alt={imageAlt}
         className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
         style={{ backfaceVisibility: "hidden" }}
       />
       <div className="absolute inset-0 pointer-events-none neon-glow-orange-bg z-20"></div>
@@ -36,6 +69,6 @@ function DigitalCards({
       </div>
     </div>
   );
-}
+});
 
 export default DigitalCards;

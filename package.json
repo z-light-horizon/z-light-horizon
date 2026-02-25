@@ -1,9 +1,9 @@
 {
-  "name": "z-one-horizon",
+  "name": "z-light-horizon",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://tanxueyi99.github.io/z-one-horizon",
+  "homepage": "https://z-light-horizon.github.io/z-light-horizon",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -15,11 +15,13 @@
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@tailwindcss/vite": "^4.1.17",
     "animate.css": "^4.1.1",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.0",
     "tailwindcss": "^4.1.17",
     "three": "^0.182.0"
   },
@@ -28,6 +30,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "baseline-browser-mapping": "^2.10.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
