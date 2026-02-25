@@ -13,7 +13,7 @@ function App() {
   return (
     <>
       {/* Mobile block screen */}
-      <div className="flex lg:hidden min-h-screen items-center justify-center bg-black px-6">
+      <div className="flex sm:hidden min-h-screen items-center justify-center bg-black px-6">
         <div className="text-center">
           <div className="text-5xl mb-4">🖥️</div>
           <h1 className="text-2xl font-semibold text-white mb-2">

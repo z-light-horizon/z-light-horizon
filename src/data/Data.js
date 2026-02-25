@@ -145,7 +145,7 @@ export const data = [
   {
     id: 12,
     name: "하늘부모님성회 천원청년교회",
-    link: "https://www.youtube.com/@%ED%95%98%EB%8A%98%EB%B6%80%EB%AA%A8%EB%8B%98%EC%84%B1%ED%9A%8C%EC%B2%9C-b5c/videos",
+    link: "https://shorturl.at/J5mOB",
     purpose: "Community",
     categories: ["Church"],
     description: "Korean church youth channel",

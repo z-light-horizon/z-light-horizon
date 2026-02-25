@@ -1,11 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Footer() {
-  const handleClick = (name) => {
-    alert(name);
-  };
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1w4A_56rih3-uD4xP1RvW0GKfHu4GT4WC_Heq4ZQvXgk/edit?gid=1184223496#gid=1184223496";
 
+export default function Footer() {
   return (
     <footer className="relative w-full bg-black pt-12 pb-0 m-0 overflow-hidden">
       {/* Half Oval Container */}
@@ -54,15 +53,19 @@ export default function Footer() {
 
             {/* Bottom Text */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-black text-lg md:text-xl font-serif">
-              <button
-                onClick={() => handleClick("Global")}
-                className="text-3xl md:text-4xl font-bold hover:underline cursor-pointer"
+              <a
+                href={SHEET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-3xl md:text-4xl font-bold hover:underline cursor-pointer text-black"
               >
                 Global
-              </button>
-              <button
-                onClick={() => handleClick("Heavenly Parent's Holy Committee")}
-                className="text-center hover:underline cursor-pointer"
+              </a>
+              <a
+                href={SHEET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-center hover:underline cursor-pointer text-black"
               >
                 <div className="italic text-lg md:text-xl">
                   Heavenly Parent's
@@ -70,19 +73,23 @@ export default function Footer() {
                 <div className="italic -mt-1 text-lg md:text-xl">
                   Holy Committee
                 </div>
-              </button>
-              <button
-                onClick={() => handleClick("Links")}
-                className="font-bold text-2xl md:text-3xl hover:underline cursor-pointer"
+              </a>
+              <a
+                href={SHEET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-2xl md:text-3xl hover:underline cursor-pointer text-black"
               >
                 Links
-              </button>
-              <button
-                onClick={() => handleClick("Center")}
-                className="font-bold text-2xl md:text-3xl hover:underline cursor-pointer"
+              </a>
+              <a
+                href={SHEET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-2xl md:text-3xl hover:underline cursor-pointer text-black"
               >
                 Center
-              </button>
+              </a>
             </div>
 
             {/* Credits Link */}

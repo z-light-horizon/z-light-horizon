@@ -32,17 +32,17 @@ export default function NewDimension({ onReturnClick, animationComplete }) {
             fontSize: "1.3rem",
           }}
         >
-          {/* White background that appears on hover */}
+          {/* Black background that slides in on hover */}
           <span
-            className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+            className="absolute inset-0 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
             style={{ zIndex: -1 }}
           ></span>
 
-          {/* Black outline on hover */}
-          <span className="absolute inset-0 border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+          {/* Black outline (visible at rest, stays on hover) */}
+          <span className="absolute inset-0 border-2 border-black transition-opacity duration-300"></span>
 
-          {/* Text that stays black */}
-          <span className="relative z-10 transition-colors duration-300">
+          {/* Text: black at rest, white on hover */}
+          <span className="relative z-10 group-hover:text-white transition-colors duration-300">
             ← Back
           </span>
         </button>
