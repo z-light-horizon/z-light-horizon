@@ -361,7 +361,7 @@ export default function Credits() {
                       paddingTop: "1rem",
                     }}
                   >
-                    RJ / Alvin Koay
+                    Alvin
                     <br />
                     &nbsp;
                   </div>
